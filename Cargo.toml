@@ -1,0 +1,22 @@
+[package]
+name = "tanucc-script-ir"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.90"
+thiserror = "1.0.64"
+
+inkwell ={ version = "0.4.0",features = ["llvm14-0"]}
+env_logger = "0.11.5"
+log = "0.4.22"
+property-rs = { git = "https://github.com/tmaru0090/property-rs", version = "0.1.0" }
+unicode-segmentation = "1.12.0"
+unicode-width = "0.2.0"
+colored = "2.1.0"
+[features]
+full = ["parser","lexer","decoder"]
+lexer = []
+parser = []
+decoder = []
+wip-system = []
