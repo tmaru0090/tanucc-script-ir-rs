@@ -26,6 +26,14 @@ pub enum IRValue<'ctx> {
     Block(BasicBlock<'ctx>),           
     None,  // 何も返さない場合
 }
+impl<'ctx> IRValue<'ctx> {
+    pub fn as_basic_value(&self) -> BasicValueEnum<'ctx> {
+        match *self {
+            IRValue::BasicValue(val) => val,
+            _ => panic!("Expected BasicValueEnum"),
+        }
+    }
+}
 #[cfg(any(feature = "full", feature = "parser"))]
 // 予約済みキーワード
 pub static RESERVED_WORDS: &[&str] = &[

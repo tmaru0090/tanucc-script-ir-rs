@@ -33,34 +33,105 @@ where
     env::remove_var(key);
 }
 
+
 fn main() -> Result<(), String> {
-    #[cfg(any(feature = "full", feature = "parser"))] {
+    #[cfg(any(feature = "full", feature = "parser"))]
+    {
         with_env_var("RUST_LOG", "debug", || {
             env_logger::init();
-            
-            let mut context = Context::create();
-            let contents = String::from("100+2");
+
+            let context = Context::create();
+            let contents = String::from("1919");
             let tokens = Lexer::from_tokenize("", contents.clone()).unwrap();
             let nodes = Parser::from_parse(&tokens, "", contents).unwrap();
 
-            // Create builder and module in a separate scope
+            // Create builder and module
             let (mut builder, mut module) = {
                 let builder = context.create_builder();
                 let module = context.create_module("example");
-                (builder, module) // Use mut here
-            }; // builder and module go out of scope here
+                (builder, module)
+            };
 
             // Move the decoder's use to a new block to avoid borrowing conflicts
             {
                 let mut decoder = Decoder::new();
                 // Ensure you pass the mutable context and builder here
-                decoder.decode(&mut builder, &mut context, &mut module, &nodes).unwrap();
-            } // decoder goes out of scope here
-
+                if let Ok(IRValue::BasicValue(value)) = decoder.decode(&mut builder, &context, &mut module, &nodes){
+           debug!("{:?}",value);
+ /*                   let i64_type = context.i64_type();
+                    let fn_type = i64_type.fn_type(&[], false);
+                    let function = module.add_function("main", fn_type, None);
+                    let builder = context.create_builder();
+                    let basic_block = context.append_basic_block(function, "entry");
+                    builder.position_at_end(basic_block);
+                    builder.build_return(Some(&value));
+   */             }
+                // モジュールの内容を標準出力に表示
+                let module_str = module.print_to_string();
+                println!("{}", module_str.to_str().unwrap());
+            }
+            /*
             debug!("{:?}", tokens);
             debug!("{:?}", nodes);
+  */
         });
         println!("Hello, world!");
     }
+
     Ok(())
 }
+
+/*
+fn main() -> Result<(), String> {
+    #[cfg(any(feature = "full", feature = "parser"))]
+    {
+        with_env_var("RUST_LOG", "debug", || {
+            env_logger::init();
+
+            let context = Context::create();
+            let contents = String::from("1919");
+            let tokens = Lexer::from_tokenize("", contents.clone()).unwrap();
+            let nodes = Parser::from_parse(&tokens, "", contents).unwrap();
+
+            // Create builder and module
+            let mut builder = context.create_builder();
+            let mut module = context.create_module("example");
+
+            // Use a block to restrict the mutable borrow scope of `module`
+            let value = {
+                let mut decoder = Decoder::new();
+                if let Ok(IRValue::BasicValue(value)) = decoder.decode(&mut builder, &context, &mut module, &nodes) {
+                    value
+                } else {
+                    todo!();
+                }
+            };
+
+            // Separate block to use the module immutably
+            {
+                let i64_type = context.i64_type();
+                let fn_type = i64_type.fn_type(&[], false);
+                let function = module.add_function("main", fn_type, None);
+
+                let builder = context.create_builder();
+                let basic_block = context.append_basic_block(function, "entry");
+                builder.position_at_end(basic_block);
+                builder.build_return(Some(&value));
+            }
+
+            // Output the module to stdout
+            let module_str = module.print_to_string();
+            println!("{}", module_str.to_str().unwrap());
+
+            /*
+            debug!("{:?}", tokens);
+            debug!("{:?}", nodes);
+            */
+        });
+        println!("Hello, world!");
+    }
+
+    Ok(())
+}*/
+
+

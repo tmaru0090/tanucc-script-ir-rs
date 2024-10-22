@@ -21,4 +21,4 @@ cargo run --features "lexer,parser,decoder"
 llc -relocation-model=pic -filetype=obj "${ir_path}"
 # オブジェクトファイルをリンクして実行可能ファイルを生成
 #g++ "${ir_file_name}.o" -o  "${ext_path}" -pie
-g++  "${ir_file_name}.o"  -o  "${ext_path}" -pieれ
+g++  "${ir_file_name}.o"  -o  "${ext_path}" -pie
